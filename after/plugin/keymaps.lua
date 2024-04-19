@@ -20,5 +20,6 @@ vim.keymap.set('n', '<leader>ca', ':lua vim.lsp.buf.code_action()', { noremap = 
 
 vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', {noremap = true, silent = true, desc="Toggle nvim-tree menu"})
 
-vim.keymap.set("n", "<C-e>j", ":lua vim.diagnostic.goto_next()", { desc = "Jump to next ESLint error" })
-vim.keymap.set("n", "<C-e>k", ":lua vim.diagnostic.goto_prev()", { desc = "Go ot previous ESLint error" })
+vim.keymap.set("n", "<C-S>j", ":lua vim.diagnostic.goto_next()", { desc = "Jump to next ESLint error" })
+vim.keymap.set("n", "<C-S>k", ":lua vim.diagnostic.goto_prev()", { desc = "Go to previous ESLint error" })
+vim.keymap.set("n", "<C-S>x", ":lua vim.diagnostic.open_float()", { desc = "Expand ESLint error"})
