@@ -45,6 +45,18 @@ return {
                     }
                 }
             })
+            require('lspconfig')['pyright'].setup{
+                on_attach = function(client, bufnr)
+                  -- Key mappings and buffer-specific settings go here
+                end,
+                settings = {
+                  python = {
+                    analysis = {
+                      typeCheckingMode = "strict"
+                    }
+                  }
+                }
+              }
         end,
     },
     {
