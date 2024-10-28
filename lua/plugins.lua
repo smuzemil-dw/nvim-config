@@ -165,6 +165,9 @@ return {
         end
     },
     {
+        "nvim-treesitter/nvim-treesitter-context"
+    },
+    {
         'L3MON4D3/LuaSnip',
         event = 'InsertEnter', -- Load LuaSnip when entering insert mode
     },
