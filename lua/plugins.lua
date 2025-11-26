@@ -8,8 +8,8 @@ return {
             require('alpha').setup(require('alpha.themes.startify').config)
         end,
     },
-    {"kyazdani42/nvim-tree.lua",
-        dependencies = "kyazdani42/nvim-web-devicons",
+    {"nvim-tree/nvim-tree.lua",
+        dependencies = "nvim-tree/nvim-web-devicons",
         config = function()
           require("nvim-tree").setup()
         end
@@ -51,7 +51,7 @@ return {
                 },
                 sections = {
                     lualine_a = {'mode'},
-                    lualine_b = {'branch', 'diff', {'diagnostics', sources={'nvim_diagnostic'}}},
+                    lualine_b = {'branch', 'diff', 'diagnostics'},
                     lualine_c = {
                         {'filename', path = 1}
                     },
@@ -149,7 +149,7 @@ return {
                 }),
             })
         end,
-        requires = {
+        dependencies = {
             "L3MON4D3/LuaSnip",
             "rafamadriz/friendly-snippets",
             "saadparwaiz1/cmp_luasnip",
