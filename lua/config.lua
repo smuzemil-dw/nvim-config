@@ -13,3 +13,5 @@ vim.opt.smartcase = true
 vim.opt.foldmethod = "indent"
 vim.opt.fillchars = { fold = " " }
 vim.opt.foldlevel = 99
+vim.opt.swapfile = true
+vim.opt.directory = os.getenv("HOME") .. "/.vim/swap//"
