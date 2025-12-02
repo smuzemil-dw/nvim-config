@@ -166,21 +166,36 @@ return {
                 sources = {
                     null_ls.builtins.formatting.prettierd.with({
                       condition = function(utils)
-                        return utils.has_file({ ".prettierrc" })
+                        return utils.has_file({ ".prettierrc", ".prettierrc.json", ".prettierrc.js", "prettier.config.js" })
                       end,
                     }),
                 },
                 on_attach = function(client, bufnr)
-                    if client.supports_method("textDocument/formatting") then
-                        vim.api.nvim_create_autocmd("BufWritePre", {
-                            buffer = bufnr,
-                            callback = function()
-                                vim.lsp.buf.format({
-                                    bufnr = bufnr,
-                                    timeout_ms = 5000,
-                                })
-                            end,
-                        })
+                    -- Only auto-format if this is the null-ls client with formatting capabilities
+                    if client.name == "null-ls" and client.supports_method("textDocument/formatting") then
+                        -- Check if prettierd is actually available for this buffer
+                        local utils = require("null-ls.utils")
+                        local has_prettier_config = utils.get_root() and (
+                            vim.fn.filereadable(utils.get_root() .. "/.prettierrc") == 1 or
+                            vim.fn.filereadable(utils.get_root() .. "/.prettierrc.json") == 1 or
+                            vim.fn.filereadable(utils.get_root() .. "/.prettierrc.js") == 1 or
+                            vim.fn.filereadable(utils.get_root() .. "prettier.config.js") == 1
+                        )
+
+                        if has_prettier_config then
+                            vim.api.nvim_create_autocmd("BufWritePre", {
+                                buffer = bufnr,
+                                callback = function()
+                                    vim.lsp.buf.format({
+                                        bufnr = bufnr,
+                                        filter = function(formatting_client)
+                                            return formatting_client.name == "null-ls"
+                                        end,
+                                        timeout_ms = 5000,
+                                    })
+                                end,
+                            })
+                        end
                     end
                 end,
             })

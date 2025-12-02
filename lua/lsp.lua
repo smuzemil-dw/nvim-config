@@ -29,6 +29,15 @@ require('mason-lspconfig').setup({
 
 -- LSP keymaps - triggered when LSP attaches to buffer
 lsp.on_attach(function(client, bufnr)
+  -- Fix for incremental sync bug: force full document sync
+  if client.server_capabilities.textDocumentSync then
+    if type(client.server_capabilities.textDocumentSync) == "table" then
+      client.server_capabilities.textDocumentSync.change = vim.lsp.protocol.TextDocumentSyncKind.Full
+    else
+      client.server_capabilities.textDocumentSync = vim.lsp.protocol.TextDocumentSyncKind.Full
+    end
+  end
+
   local opts = {buffer = bufnr, remap = false}
 
   vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
@@ -46,7 +55,14 @@ end)
 -- Diagnostic configuration
 vim.diagnostic.config({
   virtual_text = true,
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "E",
+      [vim.diagnostic.severity.WARN] = "W",
+      [vim.diagnostic.severity.HINT] = "H",
+      [vim.diagnostic.severity.INFO] = "I",
+    },
+  },
   update_in_insert = false,
   underline = true,
   severity_sort = true,
@@ -55,10 +71,3 @@ vim.diagnostic.config({
     source = 'always',
   },
 })
-
--- Change diagnostic symbols in the sign column
-local signs = { Error = "E", Warn = "W", Hint = "H", Info = "I" }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
