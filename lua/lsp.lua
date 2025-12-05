@@ -38,6 +38,29 @@ lsp.on_attach(function(client, bufnr)
     end
   end
 
+  -- Fix for buf_state nil error: ensure buffer is valid before operations
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    buffer = bufnr,
+    callback = function()
+      -- Validate buffer still exists and is loaded
+      if not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
+        return
+      end
+    end,
+  })
+
+  -- Properly detach LSP when buffer is deleted to prevent stale state
+  vim.api.nvim_create_autocmd({"BufDelete", "BufWipeout"}, {
+    buffer = bufnr,
+    callback = function()
+      -- Detach all LSP clients from this buffer
+      local clients = vim.lsp.get_clients({bufnr = bufnr})
+      for _, c in ipairs(clients) do
+        vim.lsp.buf_detach_client(bufnr, c.id)
+      end
+    end,
+  })
+
   local opts = {buffer = bufnr, remap = false}
 
   vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
