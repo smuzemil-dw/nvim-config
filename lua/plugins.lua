@@ -14,16 +14,36 @@ return {
           require("nvim-tree").setup()
         end
       },
-    { 
-        'akinsho/bufferline.nvim', 
-            version = "*", 
+    {
+        'akinsho/bufferline.nvim',
+            version = "*",
             dependencies = 'nvim-tree/nvim-web-devicons',
             config= function()
+                -- Safe buffer deletion function that detaches LSP first
+                local function safe_delete_buffer(bufnr)
+                    if not vim.api.nvim_buf_is_valid(bufnr) then
+                        return
+                    end
+
+                    -- Detach LSP clients before deleting buffer
+                    local clients = vim.lsp.get_clients({bufnr = bufnr})
+                    for _, client in ipairs(clients) do
+                        vim.lsp.buf_detach_client(bufnr, client.id)
+                    end
+
+                    -- Small delay to let LSP cleanup complete
+                    vim.defer_fn(function()
+                        if vim.api.nvim_buf_is_valid(bufnr) then
+                            vim.cmd('bdelete! ' .. bufnr)
+                        end
+                    end, 10)
+                end
+
                 require('bufferline').setup {
                 options = {
                     numbers = "ordinal",
-                    close_command = "bdelete! %d",
-                    right_mouse_command = "bdelete! %d",
+                    close_command = safe_delete_buffer,
+                    right_mouse_command = safe_delete_buffer,
                     left_mouse_command = "buffer %d",
                     middle_mouse_command = nil,
                 },
